@@ -5,7 +5,7 @@ from aiogram import Bot, Dispatcher, F
 from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.types import InputMediaPhoto
-
+from utils.database.insert_to_db import add_to_user, get_user_by_username
 load_dotenv()
 TOKEN = os.getenv("BOT_TOKEN")
 
@@ -75,14 +75,30 @@ prices = {
     "price_merenga":"Шоколадная Меренга -50 000 сум",
     "price_napoleon":"Наполеон -30 000 сум",
 }
-
 @dp.message(Command("start"))
 async def start_cmd(message: Message):
-    file_id="AgACAgIAAxkBAAMJaJ4KsQXBVPHGSs6-lRBd0c68ChwAAov2MRtcVfFI3HSm8tBaMXEBAAMCAAN4AAM2BA"
-    await message.answer_photo( photo=file_id , caption="🥂Добро пожаловать в  наш ресторан!\n\n📋 Вот наше меню:", reply_markup=menu_keyboard)
+    user = get_user_by_username(user_id=message.from_user.id) 
+    if not user:
+        add_to_user(
+            message.from_user.id,
+            message.from_user.is_bot,
+            message.from_user.first_name,
+            message.from_user.last_name,
+            message.from_user.username,
+            message.from_user.is_premium,
+        )
+
+        file_id="AgACAgIAAxkBAAMJaJ4KsQXBVPHGSs6-lRBd0c68ChwAAov2MRtcVfFI3HSm8tBaMXEBAAMCAAN4AAM2BA"
+        await message.answer_photo( photo=file_id , caption="🥂Добро пожаловать в  наш ресторан!\n\n📋 Вот наше меню:", reply_markup=menu_keyboard)
+    else:
+        file_id="AgACAgIAAxkBAAMJaJ4KsQXBVPHGSs6-lRBd0c68ChwAAov2MRtcVfFI3HSm8tBaMXEBAAMCAAN4AAM2BA"
+        await message.answer_photo( photo=file_id , caption="🥂Добро пожаловать в  наш ресторан!\n\n📋 Вот наше меню:", reply_markup=menu_keyboard)
+   
+    # file_id="AgACAgIAAxkBAAMJaJ4KsQXBVPHGSs6-lRBd0c68ChwAAov2MRtcVfFI3HSm8tBaMXEBAAMCAAN4AAM2BA"
+    # await message.answer_photo( photo=file_id , caption="🥂Добро пожаловать в  наш ресторан!\n\n📋 Вот наше меню:", reply_markup=menu_keyboard)
 
 
-photo_id = ""
+# photo_id = ""
 
 
 async def sum_numbers(a: int, b: int):
